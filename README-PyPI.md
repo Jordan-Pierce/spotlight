@@ -48,3 +48,11 @@ spotlight.show(df, dtype={"image_url": spotlight.Image})
 ```
 
 > The `datasets` package can be installed via pip.
+
+#### Install all dependencies
+
+To install all Python and JavaScript dependencies, you can use the provided `install_dependencies.sh` script. This script will install both Python and JavaScript dependencies in one step.
+
+```bash
+./install_dependencies.sh
+```
