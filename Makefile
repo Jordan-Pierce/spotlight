@@ -208,3 +208,7 @@ api-client: ## Generate API Spec and CLient
 	rsync -a --delete /tmp/spotlight-api-client/ "./src/client"
 	# auto format generated code
 	npx prettier --write './src/client/**/*.{js,ts,tsx,json,yaml,css}'
+
+.PHONY: install-dependencies
+install-dependencies: ## Install all dependencies
+	./install_dependencies.sh
