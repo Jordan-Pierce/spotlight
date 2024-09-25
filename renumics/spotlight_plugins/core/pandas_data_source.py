@@ -203,6 +203,21 @@ class PandasDataSource(DataSource):
 
         return column_names.index(column_name)
 
+    def save_dataframe(self, path: Union[str, Path], file_format: str) -> None:
+        """
+        Save the dataframe to the specified file format.
+        """
+        if file_format == "csv":
+            self._df.to_csv(path, index=False)
+        elif file_format == "parquet":
+            self._df.to_parquet(path, index=False)
+        elif file_format == "feather":
+            self._df.to_feather(path)
+        elif file_format == "orc":
+            self._df.to_orc(path)
+        else:
+            raise ValueError(f"Unsupported file format: {file_format}")
+
 
 def _determine_intermediate_dtype(column: pd.Series) -> dtypes.DType:
     if pd.api.types.is_bool_dtype(column):

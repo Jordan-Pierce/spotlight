@@ -24,6 +24,7 @@ import ColorPaletteSelect from './ui/ColorPaletteSelect';
 import { categoricalPalettes, continuousPalettes } from '../palettes';
 import Select from './ui/Select';
 import { Notation, notations, useAppSettings } from '../stores/appSettings';
+import SaveIcon from '../icons/Save'; // Import SaveIcon
 
 const NavBar = tw.nav`py-0.5 px-1 bg-gray-200 flex items-center w-full top-0 z-10 border-b border-gray-400`;
 
@@ -231,8 +232,34 @@ const UpgradeButton = (): JSX.Element => {
     );
 };
 
+const SaveButton = (): JSX.Element => {
+    const saveDataFrame = async () => {
+        const path = prompt("Enter the path to save the dataframe:");
+        if (path) {
+            const response = await fetch('/save_dataframe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path, file_format: 'csv' }),
+            });
+            if (response.ok) {
+                alert('Dataframe saved successfully.');
+            } else {
+                alert('Failed to save dataframe.');
+            }
+        }
+    };
+
+    return (
+        <Button onClick={saveDataFrame} tooltip="Save Dataframe">
+            <SaveIcon />
+        </Button>
+    );
+};
+
 type AppBarItem = JSX.Element;
-export const appBarItems: AppBarItem[] = [<UpgradeButton key="upgradeButton" />];
+export const appBarItems: AppBarItem[] = [<UpgradeButton key="upgradeButton" />, <SaveButton key="saveButton" />];
 
 const AppBar = (): JSX.Element => {
     return (

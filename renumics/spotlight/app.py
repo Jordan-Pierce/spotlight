@@ -55,6 +55,7 @@ from renumics.spotlight.reporting import (
 )
 from renumics.spotlight.settings import settings
 from renumics.spotlight.typing import PathType
+from renumics.spotlight_plugins.core.pandas_data_source import PandasDataSource
 
 CURRENT_LAYOUT_KEY = "layout.current"
 
@@ -325,6 +326,30 @@ class SpotlightApp(FastAPI):
             self.add_route(
                 "/node_modules/.pnpm/{path:path}", _reverse_proxy, ["POST", "GET"]
             )
+
+        @self.post("/save_dataframe")
+        async def save_dataframe(request: Request) -> JSONResponse:
+            data = await request.json()
+            path = data.get("path")
+            file_format = data.get("file_format")
+            if not path or not file_format:
+                return JSONResponse(
+                    {"detail": "Path and file_format are required."},
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+            if not self._data_source or not isinstance(self._data_source, PandasDataSource):
+                return JSONResponse(
+                    {"detail": "No valid pandas data source available."},
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                self._data_source.save_dataframe(path, file_format)
+            except ValueError as e:
+                return JSONResponse(
+                    {"detail": str(e)},
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+            return JSONResponse({"detail": "Dataframe saved successfully."})
 
     def update(self, config: AppConfig) -> None:
         """

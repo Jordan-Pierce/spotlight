@@ -4,6 +4,8 @@
 
 import json
 from typing import Any, List
+import os
+import tempfile
 
 import requests
 
@@ -31,3 +33,22 @@ def test_read_table(viewer_csv_df: spotlight.Viewer) -> None:
         == "Embedding"
     )
     assert _column_by_name(json_data["columns"], "video")["dtype"]["name"] == "Video"
+
+
+def test_save_dataframe(viewer_csv_df: spotlight.Viewer) -> None:
+    """test saving the dataframe to a specified file format"""
+
+    app_url = f"http://{viewer_csv_df.host}:{viewer_csv_df.port}"
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        save_path = os.path.join(temp_dir, "saved_dataframe.csv")
+        response = requests.post(
+            app_url + "/save_dataframe",
+            json={"path": save_path, "file_format": "csv"},
+            timeout=5,
+        )
+        assert response.status_code == 200
+        assert response.json()["detail"] == "Dataframe saved successfully."
+        assert os.path.exists(save_path)
+        saved_df = pd.read_csv(save_path)
+        assert not saved_df.empty
